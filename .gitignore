@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------
+# Artefactos de compilación de LaTeX
+# ---------------------------------------------------------------------------
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.lof
+*.lot
+*.out
+*.run.xml
+*.toc
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.dvi
+*.ps
+*.spl
+*.brf
+
+# BibTeX / Biber / índices / glosarios
+*.idx
+*.ilg
+*.ind
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.thm
+*.maf
+*.mtc
+*.mtc0
+*.ptc
+*.loa
+*.lol
+
+# SyncTeX
+*.synctex.gz
+*.synctex(busy)
+
+# PDF generado por la compilación.
+# Comenta esta línea si quieres versionar el PDF final en el repositorio.
+*.pdf
+
+# ---------------------------------------------------------------------------
+# Editores / IDE
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.code-workspace
+
+# ---------------------------------------------------------------------------
+# Sistema operativo
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Entornos y temporales
+# ---------------------------------------------------------------------------
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.tmp
+*.temp

@@ -1,0 +1,136 @@
+\chapter{Resultados por región}
+\label{ch:resultados}
+
+Este capítulo recoge los resultados de la auditoría aplicada a cada región. En la presente iteración solo se incluye el País Vasco; las siguientes regiones se incorporarán como nuevas secciones manteniendo la misma estructura y los mismos criterios, de modo que los resultados sean directamente comparables.
+
+% ---------------------------------------------------------------------------
+% REGIÓN: PAÍS VASCO
+% ---------------------------------------------------------------------------
+\section{País Vasco}
+\label{sec:resultados-pais-vasco}
+
+La región analizada corresponde a las tres provincias del País Vasco (Álava, Guipúzcoa y Vizcaya), contenidas en la \term{base-datos-derivada}{base de datos derivada} \code{BD_SIGPAC_NORM}. La ejecución auditó las dos tablas espaciales base con un total de 2.064.359 geometrías.
+
+\subsection{Alcance y estructura}
+
+\begin{table}[H]
+	\centering
+	\caption{Tablas espaciales auditadas (País Vasco).}
+	\label{tab:pv-alcance}
+	\begin{tabular}{@{}l r l l l@{}}
+		\toprule
+		\textbf{Tabla}                & \textbf{Geometrías} & \textbf{Tipo}       & \textbf{SRID} & \textbf{Clave primaria} \\
+		\midrule
+		\code{core.recinto}           & 1.061.018           & \code{MULTIPOLYGON} & 4258          & \code{recinto_id}       \\
+		\code{core.linea_declaracion} & 1.003.341           & \code{MULTIPOLYGON} & 4258          & \code{linea_id}         \\
+		\midrule
+		\textbf{Total}                & \textbf{2.064.359}  &                     &               &                         \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Los controles de estructura no detectaron incidencias: no hay geometrías nulas ni vacías, el tipo real coincide con el declarado (\code{ST_MultiPolygon}), no hay \term{srid}{SRID} nulos ni coordenadas Z/M inesperadas, todas las geometrías tienen un único componente y la orientación de anillos es homogénea (100\,\% CW). El rango geográfico se mantiene dentro del País Vasco.
+
+\subsection{Resumen global}
+
+\begin{table}[H]
+	\centering
+	\caption{Resumen global de la auditoría (País Vasco).}
+	\label{tab:pv-global}
+	\begin{tabularx}{\textwidth}{@{}X r@{}}
+		\toprule
+		\textbf{Métrica}                                                              & \textbf{Valor}     \\
+		\midrule
+		Tablas espaciales analizadas                                                  & 2                  \\
+		Registros analizados                                                          & 2.064.359          \\
+		Geometrías nulas                                                              & 0                  \\
+		Geometrías vacías                                                             & 0                  \\
+		Geometrías inválidas                                                          & 1.090 (0,0528\,\%) \\
+		Registros con \term{autointerseccion}{autointersección}                       & 1.090              \\
+		Registros con \term{vertices-duplicados}{vértices duplicados} no consecutivos & 699 (0,0339\,\%)   \\
+		Registros \term{geometria-degenerada}{degenerados} estrictos                  & 0                  \\
+		Registros con \term{extension-anomala}{extensión anómala}                     & 213                \\
+		Registros con \term{complejidad}{complejidad} elevada                         & 114                \\
+		\midrule
+		Total de incidencias                                                          & 3.317              \\
+		Registros afectados (únicos)                                                  & 1.394 (0,0675\,\%) \\
+		Incidencias CRÍTICAS                                                          & 2.180              \\
+		Incidencias ALTAS                                                             & 1.023              \\
+		Incidencias INFORMATIVAS                                                      & 114                \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\subsection{Resultado por tabla}
+
+\begin{table}[H]
+	\centering
+	\caption{Incidencias por tabla (País Vasco).}
+	\label{tab:pv-tabla}
+	\begin{tabular}{@{}l r r r r r r@{}}
+		\toprule
+		\textbf{Tabla}                & \textbf{Registros} & \textbf{Incidencias} & \textbf{Afectados} & \textbf{Críticas} & \textbf{Altas} & \textbf{Informativas} \\
+		\midrule
+		\code{core.recinto}           & 1.061.018          & 155                  & 127                & 26                & 15             & 114                   \\
+		\code{core.linea_declaracion} & 1.003.341          & 3.162                & 1.267              & 2.154             & 1.008          & 0                     \\
+		\midrule
+		\textbf{Total}                & 2.064.359          & 3.317                & 1.394              & 2.180             & 1.023          & 114                   \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+La tasa de invalidez es muy distinta entre ambas tablas:
+
+\begin{itemize}[leftmargin=1.5em]
+	\item \code{core.recinto}: 13 inválidas sobre 1.061.018 = \textbf{0,0012\,\%}.
+	\item \code{core.linea_declaracion}: 1.077 inválidas sobre 1.003.341 = \textbf{0,1073\,\%}, unas 87 veces mayor.
+\end{itemize}
+
+El foco crítico se concentra por tanto en \code{linea_declaracion}.
+
+\subsection{Resultado por categoría}
+
+\begin{table}[H]
+	\centering
+	\caption{Incidencias por categoría (País Vasco).}
+	\label{tab:pv-categoria}
+	\begin{tabular}{@{}l l r r@{}}
+		\toprule
+		\textbf{Categoría}                      & \textbf{Severidad} & \textbf{Incidencias} & \textbf{Registros} \\
+		\midrule
+		\code{INVALID_GEOM}                     & CRÍTICO            & 1.090                & 1.090              \\
+		\code{RING_SELF_INTERSECTION}           & CRÍTICO            & 670                  & 670                \\
+		\code{SELF_INTERSECTION}                & CRÍTICO            & 420                  & 420                \\
+		\code{VERTEX_DUPLICATE_NON_CONSECUTIVE} & ALTO               & 699                  & 699                \\
+		\code{ANOMALOUS_EXTENT}                 & ALTO               & 213                  & 213                \\
+		\code{ATTR_PERIMETER_MISMATCH}          & ALTO               & 111                  & 111                \\
+		\code{HIGH_COMPLEXITY}                  & INFORMATIVO        & 114                  & 114                \\
+		\midrule
+		\textbf{Total}                          &                    & \textbf{3.317}       & \textbf{1.394}     \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Hallazgos principales}
+
+\textbf{Invalidez topológica.} Las 1.090 geometrías inválidas lo son, en su totalidad, por \term{autointerseccion}{autointersección}: 670 autointersecciones de anillo (\code{Ring Self-intersection}) y 420 autointersecciones generales (\code{Self-intersection}), 13 de ellas en \code{recinto} y 1.077 en \code{linea_declaracion}. No aparecen agujeros fuera del polígono exterior, anillos no cerrados, anillos duplicados ni coordenadas inválidas.
+
+\textbf{Vértices duplicados.} No hay vértices consecutivos duplicados, pero sí 699 geometrías con \term{vertices-duplicados}{vértices duplicados no consecutivos} (13 en \code{recinto} y 686 en \code{linea_declaracion}). Los 699 son un subconjunto de las 1.090 inválidas (64,1\,\%), lo que indica que la repetición no consecutiva de vértices explica la mayor parte de las autointersecciones de anillo.
+
+\textbf{Degeneración y extensión.} No hay \term{geometria-degenerada}{degeneraciones} estrictas (área o longitud nula, pocos vértices o colapso). Sí hay 213 geometrías con \term{extension-anomala}{extensión anómala}: 211 en \code{linea_declaracion} con área inferior a 1\,m$^{2}$ (mínimo 1,93$\cdot$10$^{-7}$\,m$^{2}$) y 2 \term{recinto}{recintos} muy finos. Son candidatos a revisión porque, por su superficie, es improbable que representen parcelas reales.
+
+\textbf{Coherencia de atributos.} El atributo \code{dn_surface} es coherente con la geometría (0 desajustes). El atributo \code{dn_perimeter} presenta 111 desajustes en \code{linea_declaracion}, con una diferencia máxima de 189,77\,m; parece provenir de una versión geométrica distinta de la autoritativa.
+
+\textbf{Complejidad.} 114 \term{recinto}{recintos} superan los 5.000 vértices, con un máximo de 21.414. No afecta a la validez, pero sí al rendimiento de visualización, edición y validación.
+
+\subsection{Síntesis de la región}
+
+La calidad global de la región es alta: el 99,93\,\% de los registros no presenta ninguna incidencia y no hay nulos, vacíos, \term{srid}{SRID} incorrectos ni tipos erróneos. El problema crítico se concentra en \code{linea_declaracion}, donde se agrupan las 1.077 inválidas (todas por autointersección) y la mayor parte de los vértices duplicados y de las extensiones anómalas. \code{core.recinto} es, en la práctica, casi limpio (13 inválidas), con la única salvedad informativa de los 114 recintos de \term{complejidad}{complejidad} elevada.
+
+% ---------------------------------------------------------------------------
+% REGIÓN: (próximas regiones)
+% ---------------------------------------------------------------------------
+% \section{Siguiente región}
+% \label{sec:resultados-siguiente-region}
+% Añadir aquí una sección por cada nueva región auditada, replicando la
+% estructura de la \seccion{sec:resultados-pais-vasco}.

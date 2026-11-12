@@ -1,0 +1,108 @@
+% ---------------------------------------------------------------------------
+% Preámbulo común del informe de calidad geométrica
+% ---------------------------------------------------------------------------
+
+% Codificación, idioma y tipografía
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{amssymb}
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{iftex} % \ifPDFTeX: permite usar opciones exclusivas de pdfTeX sin romper XeLaTeX
+
+% Tablas, código y enlaces
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xstring}
+\usepackage[hidelinks]{hyperref}
+
+% Bibliografía según UNE-ISO 690:2013 (compilar con biber)
+% Sistema autor-fecha (Harvard): \parencite{Autor, año} y \textcite{Autor (año)}
+\usepackage{csquotes}
+\usepackage[
+	backend=biber,
+	style=iso-authoryear,
+	language=spanish,
+	autolang=other,
+	giveninits=true,
+	uniquename=init,
+	dateabbrev=false,
+]{biblatex}
+\addbibresource{bibliografia.bib}
+
+% UNE-ISO 690:2013: «Disponible en: <URL> [Consulta: <fecha>]»
+\DefineBibliographyStrings{spanish}{%
+	urlfrom = {Disponible en},
+	urlseen = {Consulta},
+	online  = {en línea},
+}
+\DeclareFieldFormat{urldate}{\mkbibbrackets{\bibstring{urlseen}\addcolon\space#1}}
+
+% La fecha de consulta se imprime detrás de la URL, como en la norma
+\renewbibmacro*{urldate}{}
+\renewbibmacro*{availability+access}{%
+	\ifboolexpr{
+		test {\iftoggle{bbx:doi}}
+		and not test {\iffieldundef{doi}}
+	}
+	{\usebibmacro{from-doi}}
+	{\ifboolexpr{
+			test {\iftoggle{bbx:eprint}}
+			and not test {\iffieldundef{eprint}}
+		}
+		{\usebibmacro{from-eprint}}
+		{\usebibmacro{url}}}%
+	\setunit{\addspace}%
+	\printurldate}
+
+\definecolor{codeblue}{RGB}{25,70,140}
+\definecolor{codegray}{RGB}{245,245,245}
+
+\lstdefinestyle{codeblock}{
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{codeblue}\bfseries,
+	stringstyle=\color{red!60!black},
+	breaklines=true,
+	columns=fullflexible,
+	frame=single,
+	rulecolor=\color{gray!40},
+	backgroundcolor=\color{codegray},
+	showstringspaces=false,
+	upquote=true,
+	tabsize=2,
+	captionpos=b
+}
+\lstset{style=codeblock}
+
+% Los bloques de código se numeran como «Código» (no «Listing»)
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Índice de códigos}
+
+% Identificadores con caracteres especiales ($, _, etc.)
+\ifPDFTeX
+	\DisableLigatures[-]{encoding=T1,family=tt*}
+\fi
+\DeclareRobustCommand{\code}[1]{%
+	\begingroup
+	\StrSubstitute{\detokenize{#1}}{\detokenize{ñ}}{\~n}[\codeA]%
+	\StrSubstitute{\codeA}{\string\$}{\textdollar}[\codeB]%
+	\noexpandarg
+	\expandafter\StrSubstitute\expandafter{\codeB}{'}{\textquotesingle}[\codeC]%
+	\texttt{\codeC}%
+	\endgroup
+}
+% En los marcadores del PDF (hiperenlaces) no puede ejecutarse xstring:
+\pdfstringdefDisableCommands{\def\code#1{\detokenize{#1}}}
+\newcommand{\seccion}[1]{Sección~\ref{#1}}
+
+% Términos enlazados con su definición (frontmatter/definiciones.tex)
+\definecolor{deflink}{RGB}{0,90,150}
+\newcommand{\term}[2]{\hyperlink{def:#1}{\textcolor{deflink}{#2}}}
+\newcommand{\defterm}[2]{\item[\hypertarget{def:#1}{#2}]}
+
+\renewcommand{\arraystretch}{1.15}

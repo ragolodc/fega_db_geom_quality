@@ -1,0 +1,40 @@
+\chapter{Introducción y contexto}
+\label{ch:introduccion}
+
+\section{Objetivo del trabajo}
+
+En el contexto del proyecto de la aplicación FEGA, se ha construido una \term{base-datos-derivada}{base de datos derivada} y normalizada (\code{BD_SIGPAC_NORM}) a partir del \term{sigpac}{SIGPAC} de origen. Esa base de datos contiene, fundamentalmente, dos objetos espaciales: los \term{recinto}{recintos} y las \term{linea-declaracion}{líneas de declaración}. Una vez materializada la base de datos derivada, resulta imprescindible verificar la calidad de las geometrías que almacena, antes de confiar en ella para cálculos de superficie, validaciones de ayudas o producción de capas derivadas.
+
+El objetivo general de este trabajo es, por tanto:
+
+\begin{quote}
+	\textit{Evaluar la \term{calidad-geometrica}{calidad geométrica} de la \term{base-datos-derivada}{base de datos derivada} mediante una auditoría sistemática y reproducible, caracterizando los defectos presentes y su severidad, sin modificar los datos originales.}
+\end{quote}
+
+Para cumplirlo se persiguen los siguientes objetivos específicos:
+
+\begin{itemize}[leftmargin=1.5em]
+	\item Definir un catálogo de defectos geométricos y topológicos a buscar, con una clasificación de \term{severidad}{severidad}.
+	\item Implementar un módulo de auditoría no destructiva sobre PostgreSQL/\term{postgis}{PostGIS}.
+	\item Aplicar la auditoría a las tablas espaciales de la base de datos derivada.
+	\item Cuantificar y localizar las incidencias detectadas, distinguiéndolas por tabla y por categoría.
+	\item Proponer, cuando proceda, criterios de reparación y de control posteriores a la carga.
+\end{itemize}
+
+\section{Alcance}
+
+El análisis se centra en las tablas espaciales base de la \term{base-datos-derivada}{base de datos derivada} \code{BD_SIGPAC_NORM}: \code{core.recinto} y \code{core.linea_declaracion}. Se excluyen las vistas de compatibilidad, que no añaden geometrías propias sino que reexponen las de las tablas base.
+
+En la primera iteración, el análisis se aplica a una única región: las tres provincias del País Vasco (Álava, Guipúzcoa y Vizcaya), contenidas en la base de datos \code{BD_SIGPAC_FEGA_15} de origen. El informe está estructurado de modo que, en iteraciones posteriores, se incorporen los resultados de otras regiones, manteniendo el mismo método y los mismos criterios para que los resultados sean comparables entre sí.
+
+Como limitaciones de este estudio inicial se declaran las siguientes:
+
+\begin{itemize}[leftmargin=1.5em]
+	\item No se analiza todavía la base de datos de origen \code{BD_SIGPAC_FEGA_15}, sino únicamente la base de datos derivada normalizada.
+	\item El análisis es \emph{intra-geometría}: no se buscan todavía solapes, huecos ni relaciones topológicas entre recintos distintos.
+	\item No se ejecutan reparaciones sobre los datos; únicamente se documentan propuestas.
+\end{itemize}
+
+\section{Observaciones sobre las métricas presentadas}
+
+Las métricas se obtuvieron en un equipo local (HP Z-BOOK-FURY, 32 GB de RAM) con PostgreSQL 16.4 y \term{postgis}{PostGIS} 3.4.3, sobre la base de datos \code{BD_SIGPAC_NORM}. Los tiempos y las cifras deben interpretarse como órdenes de magnitud, no como una prueba formal de rendimiento.
