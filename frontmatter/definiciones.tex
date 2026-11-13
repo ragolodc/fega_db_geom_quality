@@ -1,46 +1,46 @@
-\chapter*{Definiciones y conceptos}
+\chapter*{Definiciones}
 \phantomsection
-\addcontentsline{toc}{chapter}{Definiciones y conceptos}
+\addcontentsline{toc}{chapter}{Definiciones}
 \label{ch:definiciones}
-\markboth{Definiciones y conceptos}{Definiciones y conceptos}
+\markboth{Definiciones}{Definiciones}
 
 
 \begin{description}[leftmargin=0pt, labelindent=0pt, labelsep=0pt, style=nextline, itemsep=0.9em, font=\normalfont\bfseries]
 
-	\defterm{auditoria-no-destructiva}{Auditoría no destructiva} Proceso de inspección que lee y analiza los datos sin modificarlos. En este trabajo, el módulo de calidad geométrica consulta las tablas espaciales y persiste los resultados en un esquema separado (\code{audit}); no repara, elimina ni altera ninguna geometría de las tablas originales.
+	\defterm{auditoria-no-destructiva}{Auditoría no destructiva} Proceso de inspección que lee y analiza los datos sin modificarlos. En este trabajo, el módulo de calidad geométrica consulta las tablas espaciales y persiste los resultados en un esquema separado dentro de la base de datos llamado (\code{audit}).El proceso no repara, elimina ni altera ninguna geometría de las tablas originales.
 
-	\defterm{base-datos-derivada}{Base de datos derivada (\emph{read model})} Base de datos construida a partir de otra fuente, que contiene únicamente los datos necesarios para un consumidor concreto y con un diseño propio. Aquí, la base de datos \code{BD_SIGPAC_NORM}, derivada del \term{sigpac}{SIGPAC} de origen mediante un proceso \term{etl}{ETL}.
+	\defterm{base-datos-derivada}{Base de datos derivada (\emph{read model})} Base de datos construida a partir de otra fuente, que contiene únicamente los datos necesarios para un consumidor concreto y con un diseño propio.En el presente trabajo, esta base de datos es \code{BD_SIGPAC_NORM}, que fue derivada de la base de datos original del SIGPAC mediante un proceso ETL.
 
 	\defterm{calidad-geometrica}{Calidad geométrica} Conjunto de propiedades que determinan la idoneidad de la geometría de un dato espacial para su uso. Incluye, entre otras, la validez topológica, la precisión posicional, la coherencia lógica y la completitud, conforme a la norma ISO~19157 \parencite{iso19157}.
 
-	\defterm{autointerseccion}{Autointersección} Situación en la que un anillo de un polígono se cruza o se toca a sí mismo, o en la que dos anillos de la misma geometría se intersecan de forma no admitida por el modelo \term{ogc-sfs}{Simple Features}. Es la causa más habitual de invalidez topológica en datos parcelarios.
+	\defterm{autointerseccion}{Autointersección} Situación en la que un anillo de un polígono se cruza o se toca a sí mismo, o en la que dos anillos de la misma geometría se intersecan de forma no admitida por el modelo \emph{Simple Features}. Es la causa más habitual de invalidez topológica en los datos estudiados.
 
-	\defterm{geometria-invalida}{Geometría inválida} Geometría que no cumple las reglas topológicas del modelo \term{ogc-sfs}{Simple Features} del \term{ogc}{OGC}, evaluada mediante \code{ST_IsValid}. Una geometría inválida puede provocar errores o resultados incorrectos en operaciones de análisis, superposición o exportación.
+	\defterm{geometria-invalida}{Geometría inválida} Geometría que no cumple las reglas topológicas del modelo \emph{Simple Features} del OGC, evaluada mediante la función \code{ST_IsValid} de PostGIS. Una geometría inválida puede provocar errores o resultados incorrectos en operaciones de análisis, superposición o exportación.
 
-	\defterm{vertices-duplicados}{Vértices duplicados} Presencia de coordenadas idénticas repetidas en una misma geometría. Pueden ser \emph{consecutivas} (vértice repetido inmediatamente después del anterior) o \emph{no consecutivas} (repetidas en posiciones separadas del anillo). Las segundas suelen estar asociadas a \term{autointerseccion}{autointersecciones}.
+	\defterm{vertices-duplicados}{Vértices duplicados} Presencia de coordenadas idénticas repetidas en una misma geometría. Pueden ser \emph{consecutivas} (vértice repetido inmediatamente después del anterior) o \emph{no consecutivas} (repetidas en posiciones separadas del anillo). Las segundas suelen estar asociadas a autointersecciones.
 
 	\defterm{geometria-degenerada}{Geometría degenerada} Geometría con área o longitud nula, con menos vértices de los necesarios para su tipo, o colapsada a una dimensión inferior (por ejemplo, un polígono reducido a una línea o a un punto).
 
-	\defterm{extension-anomala}{Extensión anómala} Geometría cuyo tamaño o proporción resulta improbable para el dominio. En este trabajo se considera anómala una geometría con área proyectada inferior a 1\,m$^{2}$ o con una relación área/envolvente menor que 0,001 (polígonos extremadamente finos, \emph{slivers}).
+	\defterm{extension-anomala}{Extensión anómala} Geometría cuyo tamaño o proporción resulta improbable para el dominio (recintos y líneas de declaración). En este trabajo se considera anómala una geometría con área proyectada inferior a 1\,m$^{2}$ o con una relación área/envolvente menor que 0,001 (polígonos extremadamente finos, \emph{slivers}).
 
-	\defterm{complejidad}{Complejidad (de una geometría)} Número de vértices y anillos de una geometría. Una complejidad elevada (aquí, más de 5.000 vértices) no constituye un defecto topológico, pero puede degradar el rendimiento de visualización, edición y validación.
+	\defterm{complejidad}{Complejidad (de una geometría)} Número de vértices y anillos de una geometría. Una complejidad elevada (aquí, más de 5.000 vértices) no constituye un defecto topológico, pero puede degradar el rendimiento durante visualización, edición y validación.
 
 	\defterm{severidad}{Severidad} Clasificación de la gravedad de una incidencia detectada. En este trabajo se usan tres niveles: \textbf{CRÍTICO} (invalidez y degeneración), \textbf{ALTO} (defectos estructurales y de coherencia que requieren revisión) e \textbf{INFORMATIVO} (observaciones que no afectan a la validez).
 
-	\defterm{etl}{ETL (Extracción, Transformación y Carga)} Proceso de integración de datos que extrae datos de una fuente, los transforma y los carga en un destino. Es el mecanismo que materializa la \term{base-datos-derivada}{base de datos derivada} a partir del \term{sigpac}{SIGPAC} de origen.
+	\defterm{etl}{ETL (Extracción, Transformación y Carga)} Proceso de integración de datos que extrae datos de una fuente, los transforma y los carga en un destino. Es el mecanismo que materializa la base de datos derivada a partir de la base de datos original del SIGPAC.
 
-	\defterm{ogc}{OGC (Open Geospatial Consortium)} Organización que define estándares abiertos para la información geoespacial, entre ellos el modelo \term{ogc-sfs}{Simple Features}.
+	\defterm{ogc}{OGC (Open Geospatial Consortium)} Organización que define estándares abiertos para la información geoespacial, entre ellos el modelo \emph{Simple Features}.
 
-	\defterm{ogc-sfs}{Simple Features} Modelo estándar de la \term{ogc}{OGC} para la representación de geometrías vectoriales (puntos, líneas, polígonos y colecciones) y las reglas de validez que deben cumplir.
+	\defterm{ogc-sfs}{Simple Features} Modelo estándar de la OGC para la representación de geometrías vectoriales (puntos, líneas, polígonos y colecciones) y las reglas de validez que deben cumplir.
 
 	\defterm{postgis}{PostGIS} Extensión geoespacial de PostgreSQL que añade tipos de datos, índices y funciones para almacenar, consultar y validar geometrías.
 
-	\defterm{recinto}{Recinto} Unidad geográfica básica del \term{sigpac}{SIGPAC}: una superficie continua de terreno con geometría propia, localización administrativa y atributos de uso y vigencia. En la \term{base-datos-derivada}{base de datos derivada} se almacena en \code{core.recinto}.
+	\defterm{recinto}{Recinto} Unidad geográfica básica del SIGPAC: una superficie continua de terreno con geometría propia, localización administrativa y atributos de uso y vigencia. En la base de datos derivada se almacena en \code{core.recinto}.
 
-	\defterm{linea-declaracion}{Línea de declaración} Registro que asocia un producto declarado por el agricultor con un \term{recinto}{recinto} y un periodo de declaración. En la \term{base-datos-derivada}{base de datos derivada} se almacena en \code{core.linea_declaracion}.
+	\defterm{linea-declaracion}{Línea de declaración} Registro que asocia un producto declarado por el agricultor con un recinto y un periodo de declaración. En la base de datos derivada se almacena en \code{core.linea_declaracion}.
 
-	\defterm{sigpac}{SIGPAC} Sistema de Información Geográfica de Parcelas Agrícolas, registro oficial de las parcelas y \term{recinto}{recintos} declarados por los agricultores.
+	\defterm{sigpac}{SIGPAC} Sistema de Información Geográfica de Parcelas Agrícolas, registro oficial de las parcelas y recintos declarados por los agricultores.
 
-	\defterm{srid}{SRID} Identificador del sistema de referencia espacial de una geometría. En el \term{sigpac}{SIGPAC} las geometrías se almacenan en EPSG:4258 (ETRS89 geográfico).
+	\defterm{srid}{SRID} Identificador del sistema de referencia espacial de una geometría. En el SIGPAC las geometrías se almacenan en EPSG:4258 (ETRS89 geográfico).
 
 \end{description}

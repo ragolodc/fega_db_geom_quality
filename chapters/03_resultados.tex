@@ -9,7 +9,7 @@ Este capítulo recoge los resultados de la auditoría aplicada a cada región. E
 \section{País Vasco}
 \label{sec:resultados-pais-vasco}
 
-La región analizada corresponde a las tres provincias del País Vasco (Álava, Guipúzcoa y Vizcaya), contenidas en la \term{base-datos-derivada}{base de datos derivada} \code{BD_SIGPAC_NORM}. La ejecución auditó las dos tablas espaciales base con un total de 2.064.359 geometrías.
+La región analizada corresponde a las tres provincias del País Vasco (Álava, Guipúzcoa y Vizcaya), contenidas en la base de datos derivada \code{BD_SIGPAC_NORM}. La ejecución auditó las dos tablas espaciales base con un total de 2.064.359 geometrías.
 
 \subsection{Alcance y estructura}
 
@@ -29,7 +29,7 @@ La región analizada corresponde a las tres provincias del País Vasco (Álava, 
 	\end{tabular}
 \end{table}
 
-Los controles de estructura no detectaron incidencias: no hay geometrías nulas ni vacías, el tipo real coincide con el declarado (\code{ST_MultiPolygon}), no hay \term{srid}{SRID} nulos ni coordenadas Z/M inesperadas, todas las geometrías tienen un único componente y la orientación de anillos es homogénea (100\,\% CW). El rango geográfico se mantiene dentro del País Vasco.
+Los controles de estructura no detectaron incidencias: no hay geometrías nulas ni vacías, el tipo real coincide con el declarado (\code{ST_MultiPolygon}), no hay SRID nulos ni coordenadas Z/M inesperadas, todas las geometrías tienen un único componente y la orientación de anillos es homogénea (100\,\% CW). El rango geográfico se mantiene dentro del País Vasco.
 
 \subsection{Resumen global}
 
@@ -46,11 +46,11 @@ Los controles de estructura no detectaron incidencias: no hay geometrías nulas 
 		Geometrías nulas                                                              & 0                  \\
 		Geometrías vacías                                                             & 0                  \\
 		Geometrías inválidas                                                          & 1.090 (0,0528\,\%) \\
-		Registros con \term{autointerseccion}{autointersección}                       & 1.090              \\
-		Registros con \term{vertices-duplicados}{vértices duplicados} no consecutivos & 699 (0,0339\,\%)   \\
-		Registros \term{geometria-degenerada}{degenerados} estrictos                  & 0                  \\
-		Registros con \term{extension-anomala}{extensión anómala}                     & 213                \\
-		Registros con \term{complejidad}{complejidad} elevada                         & 114                \\
+		Registros con autointersección                       & 1.090              \\
+		Registros con vértices duplicados no consecutivos & 699 (0,0339\,\%)   \\
+		Registros degenerados estrictos                  & 0                  \\
+		Registros con extensión anómala                     & 213                \\
+		Registros con complejidad elevada                         & 114                \\
 		\midrule
 		Total de incidencias                                                          & 3.317              \\
 		Registros afectados (únicos)                                                  & 1.394 (0,0675\,\%) \\
@@ -113,19 +113,19 @@ El foco crítico se concentra por tanto en \code{linea_declaracion}.
 
 \subsection{Hallazgos principales}
 
-\textbf{Invalidez topológica.} Las 1.090 geometrías inválidas lo son, en su totalidad, por \term{autointerseccion}{autointersección}: 670 autointersecciones de anillo (\code{Ring Self-intersection}) y 420 autointersecciones generales (\code{Self-intersection}), 13 de ellas en \code{recinto} y 1.077 en \code{linea_declaracion}. No aparecen agujeros fuera del polígono exterior, anillos no cerrados, anillos duplicados ni coordenadas inválidas.
+\textbf{Invalidez topológica.} Las 1.090 geometrías inválidas lo son, en su totalidad, por autointersección: 670 autointersecciones de anillo (\code{Ring Self-intersection}) y 420 autointersecciones generales (\code{Self-intersection}), 13 de ellas en \code{recinto} y 1.077 en \code{linea_declaracion}. No aparecen agujeros fuera del polígono exterior, anillos no cerrados, anillos duplicados ni coordenadas inválidas.
 
-\textbf{Vértices duplicados.} No hay vértices consecutivos duplicados, pero sí 699 geometrías con \term{vertices-duplicados}{vértices duplicados no consecutivos} (13 en \code{recinto} y 686 en \code{linea_declaracion}). Los 699 son un subconjunto de las 1.090 inválidas (64,1\,\%), lo que indica que la repetición no consecutiva de vértices explica la mayor parte de las autointersecciones de anillo.
+\textbf{Vértices duplicados.} No hay vértices consecutivos duplicados, pero sí 699 geometrías con vértices duplicados no consecutivos (13 en \code{recinto} y 686 en \code{linea_declaracion}). Los 699 son un subconjunto de las 1.090 inválidas (64,1\,\%), lo que indica que la repetición no consecutiva de vértices explica la mayor parte de las autointersecciones de anillo.
 
-\textbf{Degeneración y extensión.} No hay \term{geometria-degenerada}{degeneraciones} estrictas (área o longitud nula, pocos vértices o colapso). Sí hay 213 geometrías con \term{extension-anomala}{extensión anómala}: 211 en \code{linea_declaracion} con área inferior a 1\,m$^{2}$ (mínimo 1,93$\cdot$10$^{-7}$\,m$^{2}$) y 2 \term{recinto}{recintos} muy finos. Son candidatos a revisión porque, por su superficie, es improbable que representen parcelas reales.
+\textbf{Degeneración y extensión.} No hay degeneraciones estrictas (área o longitud nula, pocos vértices o colapso). Sí hay 213 geometrías con extensión anómala: 211 en \code{linea_declaracion} con área inferior a 1\,m$^{2}$ (mínimo 1,93$\cdot$10$^{-7}$\,m$^{2}$) y 2 recintos muy finos. Son candidatos a revisión porque, por su superficie, es improbable que representen parcelas reales.
 
 \textbf{Coherencia de atributos.} El atributo \code{dn_surface} es coherente con la geometría (0 desajustes). El atributo \code{dn_perimeter} presenta 111 desajustes en \code{linea_declaracion}, con una diferencia máxima de 189,77\,m; parece provenir de una versión geométrica distinta de la autoritativa.
 
-\textbf{Complejidad.} 114 \term{recinto}{recintos} superan los 5.000 vértices, con un máximo de 21.414. No afecta a la validez, pero sí al rendimiento de visualización, edición y validación.
+\textbf{Complejidad.} 114 recintos superan los 5.000 vértices, con un máximo de 21.414. No afecta a la validez, pero sí al rendimiento de visualización, edición y validación.
 
 \subsection{Síntesis de la región}
 
-La calidad global de la región es alta: el 99,93\,\% de los registros no presenta ninguna incidencia y no hay nulos, vacíos, \term{srid}{SRID} incorrectos ni tipos erróneos. El problema crítico se concentra en \code{linea_declaracion}, donde se agrupan las 1.077 inválidas (todas por autointersección) y la mayor parte de los vértices duplicados y de las extensiones anómalas. \code{core.recinto} es, en la práctica, casi limpio (13 inválidas), con la única salvedad informativa de los 114 recintos de \term{complejidad}{complejidad} elevada.
+La calidad global de la región es alta: el 99,93\,\% de los registros no presenta ninguna incidencia y no hay nulos, vacíos, SRID incorrectos ni tipos erróneos. El problema crítico se concentra en \code{linea_declaracion}, donde se agrupan las 1.077 inválidas (todas por autointersección) y la mayor parte de los vértices duplicados y de las extensiones anómalas. \code{core.recinto} es, en la práctica, casi limpio (13 inválidas), con la única salvedad informativa de los 114 recintos de complejidad elevada.
 
 % ---------------------------------------------------------------------------
 % REGIÓN: (próximas regiones)

@@ -3,21 +3,21 @@
 
 \section{Enfoque general}
 
-La evaluación de la \term{calidad-geometrica}{calidad geométrica} se realiza mediante una \term{auditoria-no-destructiva}{auditoría no destructiva}: un motor PL/pgSQL (\code{audit.run_audit}) recorre las tablas espaciales indicadas, ejecuta una batería de controles sobre cada geometría y persiste los resultados en un esquema separado (\code{audit}). En ningún caso se modifica, repara ni elimina una geometría de las tablas originales.
+La evaluación de la calidad geométrica se realiza mediante una auditoría no destructiva que consiste en un motor PL/pgSQL denominado (\code{audit.run_audit}) que recorre las tablas espaciales indicadas, ejecuta una batería de controles sobre cada geometría y persiste los resultados en un esquema separado nombrado (\code{audit}). En ningún caso se modifica, repara ni elimina geometría alguna de las tablas originales.
 
 El procedimiento seguido es el siguiente:
 
 \begin{enumerate}[leftmargin=1.5em]
-	\item \textbf{Inventario}: se registran las tablas, columnas geométricas, tipo declarado, \term{srid}{SRID}, dimensionalidad y clave primaria de cada objeto espacial.
-	\item \textbf{Controles de estructura}: se comprueban la presencia de nulos y vacíos, el tipo real frente al declarado, el \term{srid}{SRID} real, la dimensionalidad (presencia de coordenadas Z/M) y el rango geográfico.
-	\item \textbf{Controles topológicos}: se evalúa la validez con \code{ST_IsValid}, \code{ST_IsValidReason} y \code{ST_IsValidDetail}, la simplicidad con \code{ST_IsSimple} y la orientación de los anillos con \code{ST_IsPolygonCW}/\code{ST_IsPolygonCCW}.
-	\item \textbf{Controles de degeneración y de extensión}: se buscan geometrías con área o longitud nula, con pocos vértices, colapsadas, y polígonos con \term{extension-anomala}{extensión anómala} (área inferior a 1\,m$^{2}$ o relación área/envolvente menor que 0,001).
+	\item \textbf{Inventario}: por cada objeto espacial se registran las tablas, las columnas geométricas,el tipo declarado,el SRID, la dimensionalidad y la clave primaria.
+	\item \textbf{Controles de estructura}: se comprueban la presencia de datos nulos y vacíos, el tipo de datos real frente al declarado, el SRID real, la dimensionalidad (presencia de coordenadas Z/M) y el rango geográfico.
+	\item \textbf{Controles topológicos}: mediante funciones integradas de PostGIS se evalúa la validez ( \code{ST_IsValid}, \code{ST_IsValidReason} y \code{ST_IsValidDetail}), la simplicidad  (\code{ST_IsSimple}) y la orientación de los anillos (\code{ST_IsPolygonCW}/\code{ST_IsPolygonCCW}).
+	\item \textbf{Controles de degeneración y de extensión}: se buscan geometrías con área o longitud nula, con pocos vértices, colapsadas, y polígonos con extensión anómala (área inferior a 1\,m$^{2}$ o relación área/envolvente menor que 0,001).
 	\item \textbf{Controles de vértices}: se detectan vértices consecutivos duplicados (\code{ST_RemoveRepeatedPoints}) y vértices no consecutivos duplicados (mediante \code{ST_DumpPoints} y funciones de ventana).
 	\item \textbf{Controles de coherencia}: se comparan los atributos \code{dn_surface} y \code{dn_perimeter} con el área y el perímetro calculados a partir de la geometría.
 	\item \textbf{Controles de complejidad}: se identifican las geometrías que superan un umbral de vértices (5.000 por defecto).
 \end{enumerate}
 
-Los resultados se consolidan en un inventario, una tabla centralizada de incidencias y varias vistas de resumen, y se exportan a ficheros CSV y a un informe en Markdown.
+Los resultados obtenidos se consolidan en una tabla centralizada de incidencias y varias vistas de resumen, y, además, se exportan a un fichero con extensión CSV.
 
 \section{Defectos buscados}
 
@@ -29,40 +29,40 @@ El catálogo de defectos que busca la auditoría se resume en la Tabla~\ref{tab:
 	\label{tab:defectos}
 	\begin{tabularx}{\textwidth}{@{}l X@{}}
 		\toprule
-		\textbf{Categoría}                                                     & \textbf{Descripción}                                                                                 \\
+		\textbf{Categoría}                                                     & \textbf{Descripción}                                                                  \\
 		\midrule
-		\code{NULL_GEOM} / \code{EMPTY_GEOM}                                   & Geometría nula o vacía.                                                                              \\
-		\code{INVALID_GEOM}                                                    & Geometría que no cumple las reglas de \term{ogc-sfs}{Simple Features} (\code{ST_IsValid}).           \\
-		\code{RING_SELF_INTERSECTION}                                          & Anillo de un polígono que se autointersecta.                                                         \\
-		\code{SELF_INTERSECTION}                                               & \term{autointerseccion}{Autointersección} general, incluidos cruces entre anillos.                   \\
-		\code{RING_NOT_CLOSED}                                                 & Anillo cuyo primer y último vértice no coinciden.                                                    \\
-		\code{HOLE_OUTSIDE_SHELL} / \code{NESTED_HOLES} / \code{NESTED_SHELLS} & Agujero fuera del polígono exterior, agujeros anidados o anillos exteriores anidados.                \\
-		\code{DISCONNECTED_INTERIOR}                                           & Interior del polígono desconectado.                                                                  \\
-		\code{DUPLICATE_RINGS}                                                 & Anillos duplicados.                                                                                  \\
-		\code{TOO_FEW_POINTS} / \code{INVALID_COORDINATE}                      & Número insuficiente de puntos o coordenadas no válidas.                                              \\
-		\code{DEGENERATE_*}                                                    & Geometrías \term{geometria-degenerada}{degeneradas}: área o longitud nula, pocos vértices o colapso. \\
-		\code{VERTEX_DUPLICATE_CONSECUTIVE}                                    & \term{vertices-duplicados}{Vértices duplicados} consecutivos.                                        \\
-		\code{VERTEX_DUPLICATE_NON_CONSECUTIVE}                                & \term{vertices-duplicados}{Vértices duplicados} no consecutivos.                                     \\
-		\code{ANOMALOUS_EXTENT}                                                & \term{extension-anomala}{Extensión anómala}: área inferior al umbral o polígono muy fino.            \\
-		\code{SRID_ZERO} / \code{SRID_MISMATCH} / \code{UNEXPECTED_ZM}         & \term{srid}{SRID} nulo o incorrecto, o coordenadas Z/M inesperadas.                                  \\
-		\code{TYPE_MISMATCH}                                                   & Tipo real distinto del declarado.                                                                    \\
-		\code{OUT_OF_RANGE}                                                    & Geometría fuera del rango geográfico esperado.                                                       \\
-		\code{ATTR_SURFACE_MISMATCH} / \code{ATTR_PERIMETER_MISMATCH}          & Atributos de superficie o perímetro incoherentes con la geometría.                                   \\
-		\code{MULTIPART}                                                       & Geometría multiparte con más de un componente.                                                       \\
-		\code{RING_ORIENTATION_INCONSISTENT}                                   & Orientación de anillos inconsistente (mixta CW/CCW).                                                 \\
-		\code{HIGH_COMPLEXITY}                                                 & \term{complejidad}{Complejidad} elevada (más de 5.000 vértices).                                     \\
+		\code{NULL_GEOM} / \code{EMPTY_GEOM}                                   & Geometría nula o vacía.                                                               \\
+		\code{INVALID_GEOM}                                                    & Geometría que no cumple las reglas de Simple Features (\code{ST_IsValid}).            \\
+		\code{RING_SELF_INTERSECTION}                                          & Anillo de un polígono que se auto-intersecta.                                         \\
+		\code{SELF_INTERSECTION}                                               & Auto-intersección general, incluidos cruces entre anillos.                            \\
+		\code{RING_NOT_CLOSED}                                                 & Anillo cuyo primer y último vértice no coinciden.                                     \\
+		\code{HOLE_OUTSIDE_SHELL} / \code{NESTED_HOLES} / \code{NESTED_SHELLS} & Agujero fuera del polígono exterior, agujeros anidados o anillos exteriores anidados. \\
+		\code{DISCONNECTED_INTERIOR}                                           & Interior del polígono desconectado.                                                   \\
+		\code{DUPLICATE_RINGS}                                                 & Anillos duplicados.                                                                   \\
+		\code{TOO_FEW_POINTS} / \code{INVALID_COORDINATE}                      & Número insuficiente de puntos o coordenadas no válidas.                               \\
+		\code{DEGENERATE_*}                                                    & Geometrías degeneradas: área o longitud nula, pocos vértices o colapso.               \\
+		\code{VERTEX_DUPLICATE_CONSECUTIVE}                                    & Vértices duplicados consecutivos.                                                     \\
+		\code{VERTEX_DUPLICATE_NON_CONSECUTIVE}                                & Vértices duplicados no consecutivos.                                                  \\
+		\code{ANOMALOUS_EXTENT}                                                & Extensión anómala: área inferior al umbral o polígono muy fino.                       \\
+		\code{SRID_ZERO} / \code{SRID_MISMATCH} / \code{UNEXPECTED_ZM}         & SRID nulo o incorrecto, o coordenadas Z/M inesperadas.                                \\
+		\code{TYPE_MISMATCH}                                                   & Tipo real distinto del declarado.                                                     \\
+		\code{OUT_OF_RANGE}                                                    & Geometría fuera del rango geográfico esperado.                                        \\
+		\code{ATTR_SURFACE_MISMATCH} / \code{ATTR_PERIMETER_MISMATCH}          & Atributos de superficie o perímetro incoherentes con la geometría.                    \\
+		\code{MULTIPART}                                                       & Geometría multi-parte con más de un componente.                                       \\
+		\code{RING_ORIENTATION_INCONSISTENT}                                   & Orientación de anillos inconsistente (mixta CW/CCW).                                  \\
+		\code{HIGH_COMPLEXITY}                                                 & Complejidad elevada (más de 5.000 vértices).                                          \\
 		\bottomrule
 	\end{tabularx}
 \end{table}
 
 \section{Clasificación de severidad}
 
-Cada defecto se asocia a un nivel de \term{severidad}{severidad} que orienta la prioridad de revisión:
+Cada defecto se asocia a un nivel de severidad que orienta la prioridad de revisión:
 
 \begin{itemize}[leftmargin=1.5em]
-	\item \textbf{CRÍTICO}: defectos que invalidan la geometría o la degeneran. Impiden o distorsionan las operaciones de análisis espacial. Incluyen \code{INVALID_GEOM}, las autointersecciones, los problemas de anillos y las degeneraciones.
-	\item \textbf{ALTO}: defectos estructurales o de coherencia que no invalidan necesariamente la geometría, pero requieren revisión. Incluyen nulos/vacíos, \term{vertices-duplicados}{vértices duplicados}, desajustes de \term{srid}{SRID}, extensión anómala y desajustes de atributos.
-	\item \textbf{INFORMATIVO}: observaciones que no afectan a la validez, como la presencia de multipartes, la orientación inconsistente o la \term{complejidad}{complejidad} elevada.
+	\item \textbf{CRÍTICO}: defectos que invalidan la geometría o la degeneran. Impiden o distorsionan las operaciones de análisis espacial. Incluyen \code{INVALID_GEOM}, las auto-intersecciones, los problemas de anillos y las degeneraciones.
+	\item \textbf{ALTO}: defectos estructurales o de coherencia que no invalidan necesariamente la geometría, pero requieren revisión. Incluyen nulos/vacíos, vértices duplicados, desajustes de SRID, extensión anómala y desajustes de atributos.
+	\item \textbf{INFORMATIVO}: observaciones que no afectan a la validez, como la presencia de multi-partes, la orientación inconsistente o la complejidad elevada.
 \end{itemize}
 
 \section{Contabilización de incidencias}

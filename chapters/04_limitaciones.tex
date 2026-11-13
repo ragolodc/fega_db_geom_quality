@@ -9,8 +9,8 @@
 	\item \textbf{Alcance limitado a una región}. En esta iteración solo se ha auditado el País Vasco; los resultados no son todavía extrapolables al conjunto nacional sin auditar el resto de regiones.
 	\item \textbf{Ámbito de la base derivada}. Se audita \code{BD_SIGPAC_NORM}, no la base de origen \code{BD_SIGPAC_FEGA_15}. Aunque el motor es genérico, el origen queda fuera del alcance inicial.
 	\item \textbf{Detección de vértices no consecutivos restringida}. Se aplica a geometrías no simples o inválidas (condición necesaria) y excluye el punto de cierre del anillo; no se realiza un producto cartesiano de todos los vértices.
-	\item \textbf{Reproyección métrica}. Las áreas y perímetros se calculan reproyectando de EPSG:4258 a EPSG:25830; para otros \term{srid}{SRID} se usarían unidades nativas.
-	\item \textbf{Umbrales configurables}. Los umbrales de \term{complejidad}{complejidad} (5.000 vértices) y de \term{extension-anomala}{extensión anómala} (1\,m$^{2}$ / ratio 0,001) deben validarse contra el modelo de datos oficial.
+	\item \textbf{Reproyección métrica}. Las áreas y perímetros se calculan reproyectando de EPSG:4258 a EPSG:25830; para otros SRID se usarían unidades nativas.
+	\item \textbf{Umbrales configurables}. Los umbrales de complejidad (5.000 vértices) y de extensión anómala (1\,m$^{2}$ / ratio 0,001) deben validarse contra el modelo de datos oficial.
 	\item \textbf{Interpretación de unidades}. \code{dn_surface} se interpreta en m$^{2}$ y \code{dn_perimeter} en m, deducido de la comparación con la geometría; conviene confirmarlo con el diccionario de datos.
 \end{itemize}
 
@@ -21,6 +21,6 @@
 	\item Auditar la base de datos de origen \code{BD_SIGPAC_FEGA_15}.
 	\item Ampliar el análisis a topología entre recintos (solapes, huecos, vecindad).
 	\item Ejecutar y validar las propuestas de reparación en un esquema aislado (\code{repair}).
-	\item Integrar la auditoría como control posterior a la carga en el pipeline \term{etl}{ETL}, registrando el identificador de ejecución en cada carga.
+	\item Integrar la auditoría como control posterior a la carga en el pipeline ETL, registrando el identificador de ejecución en cada carga.
 	\item Valorar restricciones de integridad geométrica (por ejemplo, \code{CHECK (ST_IsValid(geom))} con \code{NOT VALID}) y la normalización de \code{MULTIPOLYGON} a \code{POLYGON} cuando el modelo no requiera multiparte.
 \end{enumerate}

@@ -1,13 +1,13 @@
 \chapter{Conclusiones}
 \label{ch:conclusiones}
 
-El análisis de \term{calidad-geometrica}{calidad geométrica} de la \term{base-datos-derivada}{base de datos derivada} permite extraer las siguientes conclusiones:
+El análisis de calidad geométrica de la base de datos derivada permite extraer las siguientes conclusiones:
 
 \begin{enumerate}[leftmargin=1.5em]
-	\item \textbf{La calidad global es alta}. El 99,93\,\% de los registros no presenta ninguna incidencia, y no hay geometrías nulas, vacías, con \term{srid}{SRID} incorrecto, con tipo erróneo ni fuera de rango.
-	\item \textbf{El defecto crítico está concentrado en \code{linea_declaracion}}. Sus 1.077 geometrías inválidas (0,107\,\%) son, en su totalidad, \term{autointerseccion}{autointersecciones}; \code{recinto} apenas presenta 13 inválidas (0,0012\,\%).
-	\item \textbf{No hay degeneraciones estrictas}. Sí hay 213 polígonos con \term{extension-anomala}{extensión anómala}, en su mayoría de \code{linea_declaracion} con área inferior a 1\,m$^{2}$, que conviene revisar contra ortofoto o catastro.
-	\item \textbf{La repetición no consecutiva de vértices es el mecanismo dominante}. Los 699 casos de \term{vertices-duplicados}{vértices duplicados no consecutivos} explican la mayor parte de las autointersecciones de anillo.
+	\item \textbf{La calidad global es alta}. El 99,93\,\% de los registros no presenta ninguna incidencia, y no hay geometrías nulas, vacías, con SRID incorrecto, con tipo erróneo ni fuera de rango.
+	\item \textbf{El defecto crítico está concentrado en \code{linea_declaracion}}. Sus 1.077 geometrías inválidas (0,107\,\%) son, en su totalidad, autointersecciones; \code{recinto} apenas presenta 13 inválidas (0,0012\,\%).
+	\item \textbf{No hay degeneraciones estrictas}. Sí hay 213 polígonos con extensión anómala, en su mayoría de \code{linea_declaracion} con área inferior a 1\,m$^{2}$, que conviene revisar contra ortofoto o catastro.
+	\item \textbf{La repetición no consecutiva de vértices es el mecanismo dominante}. Los 699 casos de vértices duplicados no consecutivos explican la mayor parte de las autointersecciones de anillo.
 	\item \textbf{El modelo geométrico es homogéneo}. Todo es \code{MULTIPOLYGON} de un solo componente, 2D, EPSG:4258 y orientación CW. La coherencia de \code{dn_surface} es excelente; \code{dn_perimeter} requiere revisión en 111 casos.
 	\item \textbf{El método es reproducible y extensible}. La auditoría no destructiva puede aplicarse, con los mismos criterios, al resto de regiones y a la base de origen, lo que permitirá consolidar una visión nacional de la calidad del dato.
 \end{enumerate}

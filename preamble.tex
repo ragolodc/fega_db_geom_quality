@@ -100,9 +100,8 @@
 \pdfstringdefDisableCommands{\def\code#1{\detokenize{#1}}}
 \newcommand{\seccion}[1]{Sección~\ref{#1}}
 
-% Términos enlazados con su definición (frontmatter/definiciones.tex)
-\definecolor{deflink}{RGB}{0,90,150}
-\newcommand{\term}[2]{\hyperlink{def:#1}{\textcolor{deflink}{#2}}}
-\newcommand{\defterm}[2]{\item[\hypertarget{def:#1}{#2}]}
+% Entradas del glosario de frontmatter/definiciones.tex
+% \defterm{clave}{término} imprime únicamente la entrada de definición.
+\newcommand{\defterm}[2]{\item[#2]}
 
 \renewcommand{\arraystretch}{1.15}
