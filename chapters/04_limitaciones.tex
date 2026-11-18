@@ -2,6 +2,7 @@
 \label{ch:futuro}
 
 \section{Limitaciones}
+\label{sec:limitaciones}
 
 \begin{itemize}[leftmargin=1.5em]
 	\item \textbf{\code{ST_IsValidDetail} devuelve el primer motivo de invalidez}. Una geometría puede presentar más defectos no reportados individualmente; el recuento por categoría es, por tanto, una cota inferior de los defectos reales.
@@ -10,16 +11,18 @@
 	\item \textbf{Ámbito de la base derivada}. Se audita \code{BD_SIGPAC_NORM}, no la base de origen \code{BD_SIGPAC_FEGA_15}. Aunque el motor es genérico, el origen queda fuera del alcance inicial.
 	\item \textbf{Detección de vértices no consecutivos restringida}. Se aplica a geometrías no simples o inválidas (condición necesaria) y excluye el punto de cierre del anillo; no se realiza un producto cartesiano de todos los vértices.
 	\item \textbf{Reproyección métrica}. Las áreas y perímetros se calculan reproyectando de EPSG:4258 a EPSG:25830; para otros SRID se usarían unidades nativas.
-	\item \textbf{Umbrales configurables}. Los umbrales de complejidad (5.000 vértices) y de extensión anómala (1\,m$^{2}$ / ratio 0,001) deben validarse contra el modelo de datos oficial.
-	\item \textbf{Interpretación de unidades}. \code{dn_surface} se interpreta en m$^{2}$ y \code{dn_perimeter} en m, deducido de la comparación con la geometría; conviene confirmarlo con el diccionario de datos.
+	\item \textbf{Umbrales configurables}. Los umbrales de complejidad (5.000 vértices) y de extensión anómala (1\,m$^{2}$ / ratio 0,001) deben validarse contra el modelo de datos oficial. No se ha realizado un análisis de sensibilidad, de modo que los recuentos de \code{ANOMALOUS_EXTENT} y \code{HIGH_COMPLEXITY} dependen del valor elegido y podrían variar con otros umbrales.
+	\item \textbf{Interpretación de unidades}. \code{dn_surface} se interpreta en m$^{2}$ y \code{dn_perimeter} en m, unidades deducidas de la comparación con la geometría; conviene confirmarlas con el diccionario de datos y documentar la tolerancia con la que se decide que un atributo es incoherente.
+	\item \textbf{Validación del instrumento}. El motor de auditoría no se ha contrastado todavía con geometrías sintéticas de defecto conocido ni con otras herramientas de validación (QGIS, GRASS), por lo que su exactitud se apoya en las funciones de PostGIS que utiliza.
+	      %\item \textbf{Diseño descriptivo de una sola base}. Al no auditarse la base de origen no puede atribuirse al proceso ETL el origen de los defectos detectados; el informe describe el estado de la base derivada, no sus causas.
 \end{itemize}
 
 \section{Trabajo futuro}
 
 \begin{enumerate}[leftmargin=1.5em]
 	\item Incorporar los resultados del resto de regiones, replicando el método y los criterios.
-	\item Auditar la base de datos de origen \code{BD_SIGPAC_FEGA_15}.
-	\item Ampliar el análisis a topología entre recintos (solapes, huecos, vecindad).
+	      %\item Auditar la base de datos de origen \code{BD_SIGPAC_FEGA_15}.
+	\item Ampliar el análisis a topología entre los elementos de una misma capa y de capas diferentes(solapes, huecos, vecindad).
 	\item Ejecutar y validar las propuestas de reparación en un esquema aislado (\code{repair}).
 	\item Integrar la auditoría como control posterior a la carga en el pipeline ETL, registrando el identificador de ejecución en cada carga.
 	\item Valorar restricciones de integridad geométrica (por ejemplo, \code{CHECK (ST_IsValid(geom))} con \code{NOT VALID}) y la normalización de \code{MULTIPOLYGON} a \code{POLYGON} cuando el modelo no requiera multiparte.

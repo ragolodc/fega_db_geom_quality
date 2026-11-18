@@ -1,7 +1,7 @@
 \chapter{Resultados por región}
 \label{ch:resultados}
 
-Este capítulo recoge los resultados de la auditoría aplicada a cada región. En la presente iteración solo se incluye el País Vasco; las siguientes regiones se incorporarán como nuevas secciones manteniendo la misma estructura y los mismos criterios, de modo que los resultados sean directamente comparables.
+Este capítulo recoge los resultados de la auditoría aplicada a cada región. En la presente iteración solo se incluye el País Vasco. Las siguientes regiones se incorporarán como nuevas secciones manteniendo la misma estructura y los mismos criterios, de modo que los resultados sean directamente comparables.
 
 % ---------------------------------------------------------------------------
 % REGIÓN: PAÍS VASCO
@@ -39,45 +39,52 @@ Los controles de estructura no detectaron incidencias: no hay geometrías nulas 
 	\label{tab:pv-global}
 	\begin{tabularx}{\textwidth}{@{}X r@{}}
 		\toprule
-		\textbf{Métrica}                                                              & \textbf{Valor}     \\
+		\textbf{Métrica}                                  & \textbf{Valor}     \\
 		\midrule
-		Tablas espaciales analizadas                                                  & 2                  \\
-		Registros analizados                                                          & 2.064.359          \\
-		Geometrías nulas                                                              & 0                  \\
-		Geometrías vacías                                                             & 0                  \\
-		Geometrías inválidas                                                          & 1.090 (0,0528\,\%) \\
-		Registros con autointersección                       & 1.090              \\
+		Tablas espaciales analizadas                      & 2                  \\
+		Registros analizados                              & 2.064.359          \\
+		Geometrías nulas                                  & 0                  \\
+		Geometrías vacías                                 & 0                  \\
+		Geometrías inválidas                              & 1.090 (0,0528\,\%) \\
+		Registros con autointersección                    & 1.090              \\
 		Registros con vértices duplicados no consecutivos & 699 (0,0339\,\%)   \\
-		Registros degenerados estrictos                  & 0                  \\
-		Registros con extensión anómala                     & 213                \\
-		Registros con complejidad elevada                         & 114                \\
+		Registros degenerados estrictos                   & 0                  \\
+		Registros con extensión anómala                   & 213                \\
+		Registros con complejidad elevada                 & 114                \\
 		\midrule
-		Total de incidencias                                                          & 3.317              \\
-		Registros afectados (únicos)                                                  & 1.394 (0,0675\,\%) \\
-		Incidencias CRÍTICAS                                                          & 2.180              \\
-		Incidencias ALTAS                                                             & 1.023              \\
-		Incidencias INFORMATIVAS                                                      & 114                \\
+		Detecciones totales                               & 3.317              \\
+		Defectos distintos (sin clase padre)              & 2.227              \\
+		Registros afectados (únicos)                      & 1.394 (0,0675\,\%) \\
+		Defectos CRÍTICOS                                 & 1.090              \\
+		Defectos ALTOS                                    & 1.023              \\
+		Defectos INFORMATIVOS                             & 114                \\
 		\bottomrule
 	\end{tabularx}
 \end{table}
+
+Las 3.317 detecciones incluyen la categoría padre \code{INVALID_GEOM}. Al aplicar la regla de precedencia de la sección~\ref{sec:contabilizacion} quedan 2.227 defectos distintos, que son la suma de los defectos críticos, altos e informativos. Los registros afectados (1.394) no cambian con este criterio, porque ya contabilizan cada registro una sola vez.
 
 \subsection{Resultado por tabla}
 
 \begin{table}[H]
 	\centering
-	\caption{Incidencias por tabla (País Vasco).}
+	\caption{Detecciones por tabla (País Vasco).}
 	\label{tab:pv-tabla}
-	\begin{tabular}{@{}l r r r r r r@{}}
+	\begin{tabular}{@{}l r r r@{}}
 		\toprule
-		\textbf{Tabla}                & \textbf{Registros} & \textbf{Incidencias} & \textbf{Afectados} & \textbf{Críticas} & \textbf{Altas} & \textbf{Informativas} \\
+		\textbf{Métrica}    & \textbf{\code{core.recinto}} & \textbf{\code{core.linea_declaracion}} & \textbf{Total}    \\
 		\midrule
-		\code{core.recinto}           & 1.061.018          & 155                  & 127                & 26                & 15             & 114                   \\
-		\code{core.linea_declaracion} & 1.003.341          & 3.162                & 1.267              & 2.154             & 1.008          & 0                     \\
-		\midrule
-		\textbf{Total}                & 2.064.359          & 3.317                & 1.394              & 2.180             & 1.023          & 114                   \\
+		Registros           & 1.061.018          & 1.003.341          & 2.064.359          \\
+		Detecciones         & 155                & 3.162              & 3.317              \\
+		Registros afectados & 127                & 1.267              & 1.394              \\
+		Defectos críticos   & 13                 & 1.077              & 1.090              \\
+		Defectos altos      & 15                 & 1.008              & 1.023              \\
+		Defectos informativos & 114              & 0                  & 114                \\
 		\bottomrule
 	\end{tabular}
 \end{table}
+
+Las filas de severidad contabilizan defectos distintos, es decir, detecciones de categorías hoja (2.227 en total); la fila \emph{Detecciones} incluye además las de la categoría padre \code{INVALID_GEOM} (1.090). Por eso ambas magnitudes no coinciden.
 
 La tasa de invalidez es muy distinta entre ambas tablas:
 
@@ -92,11 +99,11 @@ El foco crítico se concentra por tanto en \code{linea_declaracion}.
 
 \begin{table}[H]
 	\centering
-	\caption{Incidencias por categoría (País Vasco).}
+	\caption{Detecciones por categoría (País Vasco).}
 	\label{tab:pv-categoria}
 	\begin{tabular}{@{}l l r r@{}}
 		\toprule
-		\textbf{Categoría}                      & \textbf{Severidad} & \textbf{Incidencias} & \textbf{Registros} \\
+		\textbf{Categoría}                      & \textbf{Severidad} & \textbf{Detecciones} & \textbf{Registros} \\
 		\midrule
 		\code{INVALID_GEOM}                     & CRÍTICO            & 1.090                & 1.090              \\
 		\code{RING_SELF_INTERSECTION}           & CRÍTICO            & 670                  & 670                \\
@@ -106,22 +113,23 @@ El foco crítico se concentra por tanto en \code{linea_declaracion}.
 		\code{ATTR_PERIMETER_MISMATCH}          & ALTO               & 111                  & 111                \\
 		\code{HIGH_COMPLEXITY}                  & INFORMATIVO        & 114                  & 114                \\
 		\midrule
-		\textbf{Total}                          &                    & \textbf{3.317}       & \textbf{1.394}     \\
+		\textbf{Total de detecciones}           &                    & \textbf{3.317}       & \textbf{1.394}     \\
+		\textit{Defectos distintos}             &                    & \textbf{2.227}       & \textbf{1.394}     \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
 \subsection{Hallazgos principales}
 
-\textbf{Invalidez topológica.} Las 1.090 geometrías inválidas lo son, en su totalidad, por autointersección: 670 autointersecciones de anillo (\code{Ring Self-intersection}) y 420 autointersecciones generales (\code{Self-intersection}), 13 de ellas en \code{recinto} y 1.077 en \code{linea_declaracion}. No aparecen agujeros fuera del polígono exterior, anillos no cerrados, anillos duplicados ni coordenadas inválidas.
+\textbf{Invalidez topológica.} Las 1.090 geometrías inválidas presentan siempre la autointersección como primer motivo reportado: 670 autointersecciones de anillo (\code{Ring Self-intersection}) y 420 autointersecciones generales (\code{Self-intersection}), 13 de ellas en \code{recinto} y 1.077 en \code{linea_declaracion}. Como \code{ST_IsValidDetail} devuelve un único motivo por geometría, no puede afirmarse que la autointersección sea el \emph{único} defecto presente, sino el primero detectado. No aparecen agujeros fuera del polígono exterior, anillos no cerrados, anillos duplicados ni coordenadas inválidas.
 
-\textbf{Vértices duplicados.} No hay vértices consecutivos duplicados, pero sí 699 geometrías con vértices duplicados no consecutivos (13 en \code{recinto} y 686 en \code{linea_declaracion}). Los 699 son un subconjunto de las 1.090 inválidas (64,1\,\%), lo que indica que la repetición no consecutiva de vértices explica la mayor parte de las autointersecciones de anillo.
+\textbf{Vértices duplicados.} No hay vértices consecutivos duplicados, pero sí 699 geometrías con vértices duplicados no consecutivos (13 en \code{recinto} y 686 en \code{linea_declaracion}). Los 699 son un subconjunto de las 1.090 inválidas (64,1\,\%). Dado que la búsqueda se restringió a geometrías no simples o inválidas (véase la sección~\ref{sec:limitaciones}), esta proporción no estima la prevalencia del defecto en la población ni permite atribuirle causalidad sobre las autointersecciones de anillo: describe únicamente su presencia dentro del subconjunto ya inválido.
 
-\textbf{Degeneración y extensión.} No hay degeneraciones estrictas (área o longitud nula, pocos vértices o colapso). Sí hay 213 geometrías con extensión anómala: 211 en \code{linea_declaracion} con área inferior a 1\,m$^{2}$ (mínimo 1,93$\cdot$10$^{-7}$\,m$^{2}$) y 2 recintos muy finos. Son candidatos a revisión porque, por su superficie, es improbable que representen parcelas reales.
+\textbf{Degeneración y extensión.} No hay degeneraciones estrictas (área o longitud nula, pocos vértices o colapso). Sí hay 213 geometrías con extensión anómala: 211 en \code{linea_declaracion} con área inferior a 1\,m$^{2}$ (mínimo 1,93$\cdot$10$^{-7}$\,m$^{2}$) y 2 recintos muy finos. Son candidatas a revisión porque, por su superficie, es improbable que representen parcelas reales.
 
-\textbf{Coherencia de atributos.} El atributo \code{dn_surface} es coherente con la geometría (0 desajustes). El atributo \code{dn_perimeter} presenta 111 desajustes en \code{linea_declaracion}, con una diferencia máxima de 189,77\,m; parece provenir de una versión geométrica distinta de la autoritativa.
+\textbf{Coherencia de atributos.} El atributo \code{dn_surface} es coherente con la geometría (0 desajustes). El atributo \code{dn_perimeter} presenta 111 desajustes en \code{linea_declaracion}, con una diferencia máxima de 189,77\,m; los desajustes parecen provenir de una versión geométrica distinta de la autoritativa.
 
-\textbf{Complejidad.} 114 recintos superan los 5.000 vértices, con un máximo de 21.414. No afecta a la validez, pero sí al rendimiento de visualización, edición y validación.
+\textbf{Complejidad.} 114 recintos superan los 5.000 vértices, con un máximo de 21.414. No afectan a la validez, pero sí al rendimiento de visualización, edición y validación.
 
 \subsection{Síntesis de la región}
 

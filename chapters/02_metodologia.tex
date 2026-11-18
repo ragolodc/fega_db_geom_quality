@@ -3,28 +3,29 @@
 
 \section{Enfoque general}
 
-La evaluación de la calidad geométrica se realiza mediante una auditoría no destructiva que consiste en un motor PL/pgSQL denominado (\code{audit.run_audit}) que recorre las tablas espaciales indicadas, ejecuta una batería de controles sobre cada geometría y persiste los resultados en un esquema separado nombrado (\code{audit}). En ningún caso se modifica, repara ni elimina geometría alguna de las tablas originales.
+La evaluación de la calidad geométrica se realiza mediante una auditoría no destructiva que consiste en un motor PL/pgSQL denominado \code{audit.run_audit} que recorre las tablas espaciales indicadas, ejecuta una batería de controles sobre cada geometría y persiste los resultados en un esquema separado nombrado \code{audit}. En ningún caso se modifica, repara ni elimina geometría alguna de las tablas originales.
 
 El procedimiento seguido es el siguiente:
 
 \begin{enumerate}[leftmargin=1.5em]
-	\item \textbf{Inventario}: por cada objeto espacial se registran las tablas, las columnas geométricas,el tipo declarado,el SRID, la dimensionalidad y la clave primaria.
+	\item \textbf{Inventario}: por cada objeto espacial se registran las tablas, las columnas geométricas, el tipo declarado, el SRID, la dimensionalidad y la clave primaria.
 	\item \textbf{Controles de estructura}: se comprueban la presencia de datos nulos y vacíos, el tipo de datos real frente al declarado, el SRID real, la dimensionalidad (presencia de coordenadas Z/M) y el rango geográfico.
-	\item \textbf{Controles topológicos}: mediante funciones integradas de PostGIS se evalúa la validez ( \code{ST_IsValid}, \code{ST_IsValidReason} y \code{ST_IsValidDetail}), la simplicidad  (\code{ST_IsSimple}) y la orientación de los anillos (\code{ST_IsPolygonCW}/\code{ST_IsPolygonCCW}).
+	\item \textbf{Controles topológicos}: mediante funciones integradas de PostGIS se evalúa la validez (\code{ST_IsValid}, \code{ST_IsValidReason} y \code{ST_IsValidDetail}), la simplicidad (\code{ST_IsSimple}) y la orientación de los anillos (\code{ST_IsPolygonCW}/\code{ST_IsPolygonCCW}).
 	\item \textbf{Controles de degeneración y de extensión}: se buscan geometrías con área o longitud nula, con pocos vértices, colapsadas, y polígonos con extensión anómala (área inferior a 1\,m$^{2}$ o relación área/envolvente menor que 0,001).
 	\item \textbf{Controles de vértices}: se detectan vértices consecutivos duplicados (\code{ST_RemoveRepeatedPoints}) y vértices no consecutivos duplicados (mediante \code{ST_DumpPoints} y funciones de ventana).
 	\item \textbf{Controles de coherencia}: se comparan los atributos \code{dn_surface} y \code{dn_perimeter} con el área y el perímetro calculados a partir de la geometría.
 	\item \textbf{Controles de complejidad}: se identifican las geometrías que superan un umbral de vértices (5.000 por defecto).
 \end{enumerate}
 
-Los resultados obtenidos se consolidan en una tabla centralizada de incidencias y varias vistas de resumen, y, además, se exportan a un fichero con extensión CSV.
+Los resultados obtenidos se consolidan en una tabla centralizada de incidencias y varias vistas de resumen, y, además, se exportan a un fichero CSV.
 
 \section{Defectos buscados}
 
-El catálogo de defectos que busca la auditoría se resume en la Tabla~\ref{tab:defectos}, agrupados por categoría.
+El catálogo de defectos que busca la auditoría se resume en la Tabla~\ref{tab:defectos}, con los defectos agrupados por categoría.
 
 \begin{table}[H]
 	\centering
+	\small
 	\caption{Catálogo de defectos geométricos buscados.}
 	\label{tab:defectos}
 	\begin{tabularx}{\textwidth}{@{}l X@{}}
@@ -33,7 +34,7 @@ El catálogo de defectos que busca la auditoría se resume en la Tabla~\ref{tab:
 		\midrule
 		\code{NULL_GEOM} / \code{EMPTY_GEOM}                                   & Geometría nula o vacía.                                                               \\
 		\code{INVALID_GEOM}                                                    & Geometría que no cumple las reglas de Simple Features (\code{ST_IsValid}).            \\
-		\code{RING_SELF_INTERSECTION}                                          & Anillo de un polígono que se auto-intersecta.                                         \\
+		\code{RING_SELF_INTERSECTION}                                          & Anillo de un polígono que se autointersecta.                                         \\
 		\code{SELF_INTERSECTION}                                               & Auto-intersección general, incluidos cruces entre anillos.                            \\
 		\code{RING_NOT_CLOSED}                                                 & Anillo cuyo primer y último vértice no coinciden.                                     \\
 		\code{HOLE_OUTSIDE_SHELL} / \code{NESTED_HOLES} / \code{NESTED_SHELLS} & Agujero fuera del polígono exterior, agujeros anidados o anillos exteriores anidados. \\
@@ -60,18 +61,32 @@ El catálogo de defectos que busca la auditoría se resume en la Tabla~\ref{tab:
 Cada defecto se asocia a un nivel de severidad que orienta la prioridad de revisión:
 
 \begin{itemize}[leftmargin=1.5em]
-	\item \textbf{CRÍTICO}: defectos que invalidan la geometría o la degeneran. Impiden o distorsionan las operaciones de análisis espacial. Incluyen \code{INVALID_GEOM}, las auto-intersecciones, los problemas de anillos y las degeneraciones.
+	\item \textbf{CRÍTICO}: defectos que invalidan la geometría o la degeneran. Impiden o distorsionan las operaciones de análisis espacial. Incluyen \code{INVALID_GEOM}, las autointersecciones, los problemas de anillos y las degeneraciones.
 	\item \textbf{ALTO}: defectos estructurales o de coherencia que no invalidan necesariamente la geometría, pero requieren revisión. Incluyen nulos/vacíos, vértices duplicados, desajustes de SRID, extensión anómala y desajustes de atributos.
 	\item \textbf{INFORMATIVO}: observaciones que no afectan a la validez, como la presencia de multi-partes, la orientación inconsistente o la complejidad elevada.
 \end{itemize}
 
-\section{Contabilización de incidencias}
+La severidad se asigna por categoría y los recuentos por nivel se calculan siempre sobre categorías hoja, de acuerdo con la regla de precedencia que se define en la sección~\ref{sec:contabilizacion}.
 
-Conviene distinguir dos magnitudes al leer los resultados:
+\section{Contabilización de detecciones y defectos}
+\label{sec:contabilizacion}
+
+Conviene distinguir tres magnitudes al leer los resultados:
 
 \begin{itemize}[leftmargin=1.5em]
-	\item \textbf{Total de incidencias}: cuenta cada anomalía por separado. Una misma geometría puede presentar varias incidencias de categorías distintas (por ejemplo, ser inválida y tener vértices duplicados a la vez).
-	\item \textbf{Registros afectados (únicos)}: cuenta registros únicos, evitando el doble conteo de una geometría que presenta varias anomalías.
+	\item \textbf{Detecciones}: cada comprobación que resulta positiva sobre una geometría. El motor registra una detección por cada control que falla, de modo que una misma geometría puede acumular varias.
+	\item \textbf{Defectos distintos}: las detecciones una vez aplicada la regla de precedencia que se describe a continuación.
+	\item \textbf{Registros afectados (únicos)}: registros con al menos una detección, contados una sola vez.
 \end{itemize}
 
-Esta distinción evita inflar la percepción del problema cuando unas pocas geometrías concentran varias categorías de defecto a la vez.
+Las categorías del catálogo (Tabla~\ref{tab:defectos}) no son mutuamente excluyentes. \code{INVALID_GEOM} es una categoría \emph{padre}: toda geometría que incumple las reglas de \emph{Simple Features} recibe esa detección y, además, la de la causa concreta que la provoca (\code{RING_SELF_INTERSECTION} o \code{SELF_INTERSECTION}). Para evitar el doble conteo se aplica la regla siguiente:
+
+\begin{itemize}[leftmargin=1.5em]
+	\item Cuando una geometría recibe \code{INVALID_GEOM}, solo se contabiliza como defecto la categoría hoja que describe el motivo. La detección \code{INVALID_GEOM} se conserva como indicador de invalidez agregada, pero no se suma en el recuento de defectos distintos.
+\end{itemize}
+
+Con este criterio, los recuentos por severidad se calculan sobre categorías hoja, mientras que el número de detecciones totales incluye además las de la categoría padre. Las tablas del capítulo~\ref{ch:resultados} indican en cada caso a cuál de las dos magnitudes se refiere cada cifra.
+
+Esta regla no resuelve todos los solapamientos. La duplicación de vértices puede ser la causa de la autointersección de un mismo anillo, de modo que ambas detecciones podrían describir un único defecto; lo mismo cabe decir de la extensión anómala respecto de las geometrías degeneradas. En consecuencia, el recuento de defectos distintos debe leerse como una cota superior.
+
+Por último, esta distinción evita inflar la percepción del problema cuando unas pocas geometrías concentran varias categorías de defecto a la vez.

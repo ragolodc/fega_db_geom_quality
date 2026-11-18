@@ -1,14 +1,82 @@
 \chapter{Introducción}
 \label{ch:introduccion}
 
-\section{Objetivo del trabajo}
+La tarea de evaluar la calidad de los datos geoespaciales ha sido abordada por diferentes investigadores como una cuestión esencial de los flujos de trabajo que involucran estos tipos de datos. Una parte de estos estudios se ha enfocado en formalizar las lógicas de detección de errores y en crear estructuras taxonómicas que contribuyan a la agrupación de dichos errores para su mejor interpretación y análisis. En \cite{servigne_methodology_2000}, un trabajo pionero en este ámbito, los autores proponen una clasificación de aquellos errores que afectan la consistencia espacial de los conjuntos de datos vectoriales. Proponen tres grupos:
 
-En el contexto del proyecto de la aplicación del FEGA, se ha construido una base de datos derivada y normalizada (\code{BD_SIGPAC_NORM}) a partir de la base de datos original del SIGPAC. La base de datos derivada contiene dos objetos con dimensión espacial: los recintos y las líneas de declaración. De cada uno de estos objetos se requiere verificar la calidad de las geometrías que almacenan, antes de emplear dichas geometrías en cálculos de superficie, validaciones de ayudas o producción de capas derivadas.
+\begin{table}[H]
+	\centering
+	\caption{Clasificación de errores que afectan la consistencia espacial propuesta por \cite{servigne_methodology_2000}. Se proponen tres categorías de errores: estructurales, geométricos y topo-semánticos.}
+	\label{tab:servigne_errores}
+	\begin{tabularx}{\textwidth}{@{}l X@{}}
+		\toprule
+		\textbf{Categoría}      & \textbf{Descripción}                                                                                                                                                           \\
+		\midrule
+		Errores estructurales   & Son errores derivados de la estructura de los datos. Están relacionados con inconsistencias entre el modelo de datos y algunas estructuras de almacenamiento o representación. \\
+		Errores geométricos     & Son errores que provienen de la parte geométrica de los objetos, específicamente de la forma y la posición.                                                                    \\
+		Errores topo-semánticos & Son los errores que se circunscriben al ámbito de las relaciones topológicas entre los objetos y a la semántica real de dichos objetos en el mundo que intentan modelar.       \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+Además de la segmentación de los errores por su impacto en la consistencia espacial, en \cite{servigne_methodology_2000} se reconoce que los errores pueden tener consecuencias de diferentes grados, no determinadas por su categoría de clasificación:
+
+\begin{itemize}
+	\item Algunos errores impiden realizar las operaciones espaciales directamente.
+	\item Otros permiten ejecutar las operaciones, pero producen resultados incorrectos.
+\end{itemize}
+
+Esta distinción deja ver una nueva arista: errores de una misma naturaleza pueden afectar los flujos de manera más o menos severa.
+
+En un trabajo posterior, \cite{kukulska_methodology_2018} se centra en hacer una diferenciación explícita entre los errores topológicos y geométricos (ambos son subconjuntos de las categorías definidas en \cite{servigne_methodology_2000}). El estudio se centra, no solo en detectar estos errores, sino también en corregirlos, apoyándose en el Sistema de Información Geográfica QGIS. Los autores emplean estudios anteriores para establecer los errores a encontrar y reparar, algunos de los cuales son:
+
+\textbf{Errores geométricos}
+
+\begin{itemize}[leftmargin=1.5em]
+	\item Duplicación de puntos
+	\item Líneas superpuestas
+	\item Cruces o intersecciones no deseadas de líneas
+\end{itemize}
+
+\textbf{Errores topológicos}
+
+\begin{itemize}[leftmargin=1.5em]
+	\item Líneas flotantes o demasiado cortas
+	\item Líneas superpuestas
+	\item Líneas que sobrepasan la intersección (\emph{Overshoots})
+	\item Líneas que no llegan a la intersección (\emph{Undershoots})
+	\item Polígonos no cerrados
+	\item Polígonos con geometrías anómalas
+\end{itemize}
+
+Nótese que en \cite{kukulska_methodology_2018} se pone en ambos grupos el problema de la \textbf{línea superpuesta}. Esto, desde un punto de vista estricto, y considerando ambos conjuntos de errores como disyuntos, es una imprecisión, en cuanto no se aclara la razón de esta dualidad. En el presente trabajo, los autores consideran que dado que la superposición está definida como una relación topológica, en caso de considerarse este tipo de relación como error debería incluirse en el grupo de los errores topológicos.
+
+Un ejemplo de clasificación de errores basada en su severidad se presenta en \cite{kruiger_loose_2021}. En el mencionado trabajo se definen cuatro tipos de errores con dos niveles de severidad. Esta clasificación se recoge en la Tabla~\ref{tab:kruiger_errores}.
+
+\begin{table}[H]
+	\centering
+	\caption{Tipos de errores definidos en \cite{kruiger_loose_2021}, agrupados por severidad y por naturaleza del error.}
+	\label{tab:kruiger_errores}
+	\begin{tabularx}{\textwidth}{@{}l l X@{}}
+		\toprule
+		\textbf{Severidad} & \textbf{Categoría}       & \textbf{Descripción}                                                                                          \\
+		\midrule
+		Errores duros      & Errores estructurales    & Errores que impiden ejecutar correctamente un proceso debido a incompatibilidades entre herramientas y datos. \\
+		Errores duros      & Imprecisiones semánticas & Errores que producen resultados inválidos o carentes de significado.                                          \\
+		Errores blandos    & Redundancias             & Operaciones innecesarias que no invalidan el resultado.                                                       \\
+		Errores blandos    & Calidad del dato         & Transformaciones que reducen la calidad de los datos, pero permiten obtener un resultado utilizable.          \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+Se debe mencionar que los autores del referido estudio se enfocan más en la evaluación de los procesos realizados con Sistemas de Información Geográfica que en el análisis específico de los defectos geométricos y topológicos. Sin embargo, la idea que encierra su modelo de severidad es aprovechable a los intereses del presente estudio.
+
+\section{Objetivo del trabajo}
+Los estudios anteriores demuestran que la evaluación de la calidad de los datos no es solo deseable, sino también necesaria en aras de obtener resultados coherentes en los flujos de trabajo que involucran datos geoespaciales. Así, en el marco del proyecto de la aplicación FEGA, una vez implementada la base de datos derivada y normalizada \code{BD_SIGPAC_NORM} a partir de la base de datos original del SIGPAC, es altamente recomendable la evaluación de la calidad de sus datos. Este análisis se orientará, de acuerdo a la taxonomía de \cite{servigne_methodology_2000}, a la identificación de errores geométricos y topológicos (solo la componente topológica de los errores topo-semánticos) en los dos objetos con dimensión espacial de la base de datos: los recintos y las líneas de declaración. De cada uno de estos objetos se requiere verificar la calidad de las geometrías que almacenan, antes de emplear dichas geometrías en cálculos de superficie, análisis de solapamientos, producción de capas derivadas, etc.
 
 El objetivo general de este trabajo es, por tanto:
 
 \begin{quote}
-	\textit{Evaluar la calidad geométrica de la base de datos derivada mediante una auditoría reproducible no destructiva que detecte y clasifique, en cuanto a severidad, los defectos presentes.}
+	\textit{Evaluar la calidad geométrica y topológica de la base de datos derivada mediante una auditoría reproducible no destructiva que detecte y clasifique, en cuanto a severidad, los defectos presentes.}
 \end{quote}
 
 El cumplimiento del objetivo general se alcanza a través de los siguientes objetivos específicos:
@@ -23,9 +91,9 @@ El cumplimiento del objetivo general se alcanza a través de los siguientes obje
 
 \section{Alcance}
 
-El análisis se centra en las tablas espaciales de la base de datos derivada \code{BD_SIGPAC_NORM}: \code{core.recinto} y \code{core.linea_declaracion}. Se excluyen las vistas de compatibilidad, que no añaden geometrías propias sino que exponen las de las tablas bases.
+El análisis se centra en las tablas espaciales de la base de datos derivada \code{BD_SIGPAC_NORM}: \code{core.recinto} y \code{core.linea_declaracion}. Se excluyen las vistas de compatibilidad, que no añaden geometrías propias sino que exponen las de las tablas base.
 
-En la primera iteración, el análisis se aplica a una única región: las tres provincias del País Vasco (Álava, Guipúzcoa y Vizcaya), contenidas en la base de datos \code{BD_SIGPAC_NORM} de origen. El informe está estructurado de modo que, en iteraciones posteriores, se incorporen los resultados de otras regiones, manteniendo el mismo método y los mismos criterios para que los resultados sean comparables entre sí.
+En la primera iteración, el análisis se aplica a una única región: las tres provincias del País Vasco (Álava, Guipúzcoa y Vizcaya), contenidas en la base de datos derivada \code{BD_SIGPAC_NORM}, obtenida de la base de datos de origen \code{BD_SIGPAC_FEGA_15}. El informe está estructurado de modo que, en iteraciones posteriores, se incorporen los resultados de otras regiones, manteniendo el mismo método y los mismos criterios para que los resultados sean comparables entre sí.
 
 Como limitaciones de este estudio inicial se declaran las siguientes:
 
@@ -34,6 +102,7 @@ Como limitaciones de este estudio inicial se declaran las siguientes:
 	\item El análisis es \emph{intra-geometría}: no se buscan todavía solapes, huecos ni relaciones topológicas entre elementos de una misma tabla o de tablas diferentes.
 	\item No se ejecutan operaciones de reparación sobre los datos; únicamente se documentan propuestas.
 \end{itemize}
+
 
 \section{Observaciones sobre las métricas presentadas}
 
